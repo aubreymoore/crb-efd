@@ -1,5 +1,7 @@
 # README.md
 
+GitHub repository: [https://github.com/aubreymoore/crb-efd](https://github.com/aubreymoore/crb-efd)
+
 This repo explores use of elliptic Fourier descriptors (EFDs) for for finding and locating "defects" in the form of v-shape to coconut palm fronds, a distinctive symptom of coconut rhinoceros beetle damage.
 
 ## Counting defects
