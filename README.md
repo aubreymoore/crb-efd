@@ -47,4 +47,6 @@ Code in this notebook optimizes parameters for `efd_find_cuts.py`, namely `EDF o
 
 ## Modules
 
-To streamline, I created some Python modules. Have a look at [efd_sim_palm.py](efd_sim_palm.py) and [efd_find_cuts.py](efd_find_cuts.py).
+To streamline, I created some Python modules. Have a look at:
+- [efd_sim_palm.py](efd_sim_palm.py)
+- [efd_find_cuts.py](efd_find_cuts.py)

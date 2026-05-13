@@ -1,11 +1,10 @@
 from sim_palm import generate_palm_with_cuts
-
-from pyefd import elliptic_fourier_descriptors, reconstruct_contour
-import matplotlib.pyplot as plt
-import cv2
-import numpy as np
-
 from icecream import ic
+from pyefd import elliptic_fourier_descriptors, reconstruct_contour
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+
 
 def efd_find_cuts(original_contour, original_mask, order=40, ksize=(7,7), iterations=1, return_plot_data=False):
     """ 
@@ -34,6 +33,13 @@ def efd_find_cuts(original_contour, original_mask, order=40, ksize=(7,7), iterat
         plot_data           a dict containing binary masks for visualization  
     """
 
+    ic.disable()
+
+    # original_contour, original_mask = generate_palm_with_cuts(ncuts)
+    # ic(original_contour)
+    # ic(original_mask)
+    # ic(np.sum(original_mask))
+
     # calc EFDs
     coeffs = elliptic_fourier_descriptors(original_contour, order, normalize=False)
 
@@ -43,19 +49,28 @@ def efd_find_cuts(original_contour, original_mask, order=40, ksize=(7,7), iterat
     # Calculate the centroid of the original to shift the reconstruction back
     # EFD reconstruction is often centered at (0,0) or uses the DC component (coeffs[0])
     centroid = np.mean(original_contour, axis=0)
+    ic(centroid)
     reconstructed_contour += centroid
     reconstructed_contour = reconstructed_contour.astype(np.int32)
+    ic(reconstructed_contour)
+
     reconstructed_mask = cv2.fillPoly(np.zeros_like(original_mask), pts=[reconstructed_contour], color=1)
+    ic(reconstructed_mask)
+    ic(np.sum(reconstructed_mask))
 
     # Calculate the difference mask
     diff_mask = reconstructed_mask & ~original_mask
+    ic(diff_mask)
 
-    # Remove thin lines by applying the "open" morphological opertation
+    # Create clean_mask
+    # Define kernel (size depends on how thick the "thin" features are)
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, ksize=ksize)
+    # Apply Opening
     clean_mask = cv2.morphologyEx(diff_mask, cv2.MORPH_OPEN, kernel, iterations=iterations)
     
     # get vcut contours
     contours, _ = cv2.findContours(image=clean_mask, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
+    ic.enable()
     
     if return_plot_data:
         plot_data = {
@@ -68,18 +83,13 @@ def efd_find_cuts(original_contour, original_mask, order=40, ksize=(7,7), iterat
     
     return contours
 
-    
 if __name__ == "__main__":
-    
-    # the following test/demo code is executed only when this file is run as a Python script
 
-    # parameters for this run
-    ncuts = 4       #  of cuts applied to simulated coconut palm
-    order = 40      # number of EFD harmonics
-    ksize = (7,7)   # kernel size for morphological operation
-    iterations=1    # number of times morphological operation is applied
+    ncuts = 4
+    order = 40
+    ksize = (7,7)
+    iterations=1
 
-    # generate a synthetic data
     contour, mask = generate_palm_with_cuts(ncuts)
 
     ic('USE CASE 1 - without plots')
